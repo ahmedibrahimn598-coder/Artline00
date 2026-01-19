@@ -1,0 +1,3227 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ARTLINE - Project Management System</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary: #2E3A87;
+            --primary-dark: #1F2656;
+            --accent: #FF5722;
+            --success: #4CAF50;
+            --warning: #FF9800;
+            --bg-main: #F5F7FA;
+            --bg-light: #FFFFFF;
+            --text-primary: #2C3E50;
+            --text-secondary: #7F8C8D;
+            --border: #E0E6ED;
+            --shadow: rgba(46, 58, 135, 0.1);
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            background: var(--bg-main);
+            color: var(--text-primary);
+            overflow-x: hidden;
+        }
+
+        /* Login Page Styles */
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #FFFFFF 0%, #F0F2F8 100%);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .login-container::before {
+            content: '';
+            position: absolute;
+            width: 600px;
+            height: 600px;
+            background: radial-gradient(circle, rgba(46, 58, 135, 0.05) 0%, transparent 70%);
+            top: -250px;
+            right: -250px;
+            animation: float 8s ease-in-out infinite;
+        }
+
+        .login-container::after {
+            content: '';
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: radial-gradient(circle, rgba(255, 87, 34, 0.05) 0%, transparent 70%);
+            bottom: -200px;
+            left: -200px;
+            animation: float 10s ease-in-out infinite reverse;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0) rotate(0deg); }
+            50% { transform: translateY(-40px) rotate(15deg); }
+        }
+
+        .login-box {
+            background: white;
+            border-radius: 24px;
+            padding: 60px 50px;
+            width: 480px;
+            box-shadow: 0 20px 60px rgba(46, 58, 135, 0.15);
+            position: relative;
+            z-index: 1;
+            animation: slideUp 0.6s ease-out;
+            border: 1px solid var(--border);
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(40px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .login-header {
+            text-align: center;
+            margin-bottom: 40px;
+        }
+
+        .login-logo {
+            width: 280px;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        .login-subtitle {
+            color: var(--text-secondary);
+            font-size: 15px;
+            font-weight: 500;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 14px;
+            font-weight: 600;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .form-label-optional {
+            color: var(--text-secondary);
+            font-weight: 400;
+            font-size: 12px;
+        }
+
+        .form-input {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            transition: all 0.3s ease;
+        }
+
+        .form-input:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+            box-shadow: 0 0 0 4px rgba(46, 58, 135, 0.1);
+        }
+
+        .form-input-small {
+            padding: 12px 16px;
+            font-size: 14px;
+        }
+
+        .measurement-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 15px;
+        }
+
+        .date-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-right: 8px;
+            margin-bottom: 8px;
+        }
+
+        .date-badge.deadline {
+            background: rgba(255, 87, 34, 0.1);
+            border-color: var(--accent);
+            color: var(--accent);
+        }
+
+        .date-badge.overdue {
+            background: rgba(231, 76, 60, 0.1);
+            border-color: #E74C3C;
+            color: #E74C3C;
+        }
+
+        .file-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 12px;
+            padding: 30px;
+            text-align: center;
+            background: var(--bg-main);
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .file-upload-area:hover {
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .file-upload-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+        }
+
+        .file-upload-text {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 500;
+        }
+
+        .file-upload-input {
+            display: none;
+        }
+
+        .uploaded-file {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            padding: 12px 16px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            margin-top: 10px;
+        }
+
+        .uploaded-file-icon {
+            font-size: 24px;
+        }
+
+        .uploaded-file-info {
+            flex: 1;
+        }
+
+        .uploaded-file-name {
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 2px;
+        }
+
+        .uploaded-file-size {
+            font-size: 12px;
+            color: var(--text-secondary);
+        }
+
+        .uploaded-file-remove {
+            background: transparent;
+            border: none;
+            color: #E74C3C;
+            cursor: pointer;
+            font-size: 20px;
+            padding: 4px 8px;
+            transition: all 0.2s ease;
+        }
+
+        .uploaded-file-remove:hover {
+            color: #C0392B;
+        }
+
+        .login-button {
+            width: 100%;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-size: 16px;
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-top: 10px;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .login-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 15px 35px rgba(46, 58, 135, 0.3);
+        }
+
+        .login-button:active {
+            transform: translateY(-1px);
+        }
+
+        .error-message {
+            color: #E74C3C;
+            font-size: 14px;
+            margin-top: 12px;
+            text-align: center;
+            font-weight: 500;
+            background: rgba(231, 76, 60, 0.1);
+            padding: 10px;
+            border-radius: 8px;
+        }
+
+        /* Main Dashboard Styles */
+        .dashboard {
+            display: flex;
+            min-height: 100vh;
+            background: var(--bg-main);
+        }
+
+        .sidebar {
+            width: 300px;
+            background: white;
+            border-right: 1px solid var(--border);
+            padding: 30px 0;
+            display: flex;
+            flex-direction: column;
+            box-shadow: 2px 0 10px rgba(0, 0, 0, 0.03);
+        }
+
+        .sidebar-header {
+            padding: 0 30px 30px;
+            border-bottom: 1px solid var(--border);
+        }
+
+        .sidebar-logo-img {
+            width: 200px;
+            height: auto;
+            margin-bottom: 15px;
+        }
+
+        .company-name {
+            font-size: 15px;
+            color: var(--text-secondary);
+            font-weight: 600;
+        }
+
+        .user-role-badge {
+            display: inline-block;
+            padding: 4px 12px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border-radius: 12px;
+            font-size: 11px;
+            font-weight: 700;
+            color: white;
+            text-transform: uppercase;
+            margin-top: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .user-role-badge.viewer {
+            background: linear-gradient(135deg, #95A5A6 0%, #7F8C8D 100%);
+        }
+
+        .sidebar-nav {
+            flex: 1;
+            padding: 30px 20px;
+        }
+
+        .nav-item {
+            display: flex;
+            align-items: center;
+            padding: 16px 20px;
+            margin-bottom: 10px;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 600;
+            color: var(--text-secondary);
+        }
+
+        .nav-item:hover {
+            background: var(--bg-main);
+            color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .nav-item.active {
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 58, 135, 0.3);
+        }
+
+        .nav-icon {
+            font-size: 22px;
+            margin-right: 15px;
+            width: 24px;
+            height: 24px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .sidebar-footer {
+            padding: 20px 30px;
+            border-top: 1px solid var(--border);
+        }
+
+        .logout-button {
+            width: 100%;
+            padding: 14px;
+            background: white;
+            border: 2px solid var(--accent);
+            border-radius: 12px;
+            color: var(--accent);
+            font-weight: 700;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .logout-button:hover {
+            background: var(--accent);
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 8px 20px rgba(255, 87, 34, 0.3);
+        }
+
+        .main-content {
+            flex: 1;
+            padding: 40px;
+            overflow-y: auto;
+            max-height: 100vh;
+        }
+
+        .content-header {
+            margin-bottom: 40px;
+        }
+
+        .page-title {
+            font-size: 38px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--primary);
+            letter-spacing: -0.5px;
+        }
+
+        .page-subtitle {
+            color: var(--text-secondary);
+            font-size: 16px;
+            font-weight: 500;
+        }
+
+        /* View-only notice */
+        .view-only-notice {
+            background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
+            border: 2px solid #FFB74D;
+            border-radius: 16px;
+            padding: 20px 25px;
+            margin-bottom: 30px;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .view-only-notice-icon {
+            font-size: 32px;
+        }
+
+        .view-only-notice-text {
+            flex: 1;
+        }
+
+        .view-only-notice-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #E65100;
+            margin-bottom: 4px;
+        }
+
+        .view-only-notice-description {
+            font-size: 14px;
+            color: #EF6C00;
+        }
+
+        /* Kanban Board Styles */
+        .kanban-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 35px;
+        }
+
+        .add-project-button {
+            padding: 16px 32px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 15px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 4px 15px rgba(255, 87, 34, 0.3);
+        }
+
+        .add-project-button:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(255, 87, 34, 0.4);
+        }
+
+        .add-project-button:disabled {
+            background: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .kanban-board {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .kanban-column {
+            background: white;
+            border-radius: 16px;
+            padding: 25px;
+            border: 1px solid var(--border);
+            min-height: 650px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .kanban-column.drag-over {
+            background: rgba(46, 58, 135, 0.05);
+            border-color: var(--primary);
+        }
+
+        .column-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 3px solid var(--border);
+        }
+
+        .column-title {
+            font-size: 16px;
+            font-weight: 800;
+            text-transform: uppercase;
+            letter-spacing: 1.2px;
+        }
+
+        .column-count {
+            background: var(--bg-main);
+            padding: 6px 12px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        /* Simplified Project Card */
+        .project-card {
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 14px;
+            padding: 20px;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .project-card.draggable {
+            cursor: grab;
+        }
+
+        .project-card.view-only {
+            cursor: pointer;
+        }
+
+        .project-card:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 10px 30px rgba(46, 58, 135, 0.15);
+            border-color: var(--primary);
+        }
+
+        .project-card.dragging {
+            opacity: 0.5;
+            cursor: grabbing;
+        }
+
+        .project-card-name {
+            font-weight: 700;
+            font-size: 18px;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .project-card-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 10px;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .project-card-company {
+            display: block;
+            font-size: 13px;
+            color: var(--text-secondary);
+            font-weight: 600;
+            margin-top: 8px;
+        }
+
+        /* Project Detail Modal */
+        .detail-modal {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 45px;
+            width: 850px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 30px;
+            padding-bottom: 25px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .detail-title-section {
+            flex: 1;
+        }
+
+        .detail-title {
+            font-size: 32px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--primary);
+        }
+
+        .detail-badges {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .detail-company {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .detail-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .detail-close {
+            background: var(--bg-main);
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-size: 24px;
+            color: var(--text-secondary);
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .detail-close:hover {
+            background: #E74C3C;
+            color: white;
+        }
+
+        .detail-section {
+            margin-bottom: 30px;
+        }
+
+        .detail-section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--primary);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-info-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .detail-info-item {
+            background: var(--bg-main);
+            padding: 18px;
+            border-radius: 12px;
+        }
+
+        .detail-info-label {
+            font-size: 12px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            margin-bottom: 8px;
+        }
+
+        .detail-info-value {
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .detail-info-link {
+            color: var(--primary);
+            text-decoration: none;
+            font-weight: 600;
+        }
+
+        .detail-info-link:hover {
+            text-decoration: underline;
+        }
+
+        .detail-dates {
+            display: flex;
+            gap: 15px;
+        }
+
+        .detail-attachments {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 12px;
+        }
+
+        .detail-attachment {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            padding: 12px 18px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 10px;
+            font-size: 14px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .detail-attachment:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+            transform: translateY(-2px);
+        }
+
+        .detail-actions {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+            padding-top: 25px;
+            border-top: 2px solid var(--border);
+        }
+
+        .project-name {
+            font-weight: 700;
+            font-size: 16px;
+            margin-bottom: 10px;
+            color: var(--text-primary);
+        }
+
+        .project-company {
+            display: inline-block;
+            padding: 4px 10px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .project-type {
+            display: inline-block;
+            padding: 6px 14px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border-radius: 8px;
+            font-size: 11px;
+            font-weight: 700;
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            margin-left: 8px;
+            letter-spacing: 0.5px;
+            color: white;
+        }
+
+        .project-dates {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            margin-bottom: 10px;
+        }
+
+        .project-measurements {
+            font-size: 13px;
+            color: var(--text-secondary);
+            margin-bottom: 8px;
+            font-weight: 600;
+        }
+
+        .project-address {
+            font-size: 14px;
+            color: var(--text-secondary);
+            margin-bottom: 10px;
+            display: flex;
+            align-items: flex-start;
+            gap: 6px;
+        }
+
+        .project-location {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            color: var(--primary);
+            font-size: 13px;
+            font-weight: 600;
+            text-decoration: none;
+            margin-bottom: 12px;
+        }
+
+        .project-location:hover {
+            text-decoration: underline;
+        }
+
+        .project-attachments {
+            display: flex;
+            gap: 8px;
+            flex-wrap: wrap;
+            margin-bottom: 12px;
+        }
+
+        .attachment-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 6px 12px;
+            background: var(--bg-main);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 600;
+            color: var(--text-primary);
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .attachment-badge:hover {
+            background: white;
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        .project-actions {
+            display: flex;
+            gap: 8px;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid var(--border);
+        }
+
+        .btn-next {
+            flex: 1;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-next:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(46, 58, 135, 0.3);
+        }
+
+        .btn-next:disabled {
+            background: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-add-design {
+            flex: 1;
+            padding: 14px 20px;
+            background: linear-gradient(135deg, var(--success) 0%, #388E3C 100%);
+            border: none;
+            border-radius: 10px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+        }
+
+        .btn-add-design:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(76, 175, 80, 0.3);
+        }
+
+        .btn-add-design:disabled {
+            background: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+            box-shadow: none;
+        }
+
+        .btn-delete {
+            padding: 14px 20px;
+            background: white;
+            border: 2px solid #E74C3C;
+            border-radius: 10px;
+            color: #E74C3C;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 14px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-delete:hover:not(:disabled) {
+            background: #E74C3C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+        .btn-delete:disabled {
+            background: var(--bg-main);
+            border-color: var(--border);
+            color: var(--text-secondary);
+            cursor: not-allowed;
+            transform: none;
+        }
+
+        /* Modal Styles */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: rgba(0, 0, 0, 0.5);
+            backdrop-filter: blur(8px);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            z-index: 1000;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        .modal {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 24px;
+            padding: 45px;
+            width: 750px;
+            max-height: 90vh;
+            overflow-y: auto;
+            animation: slideUp 0.4s ease;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+        }
+
+        .modal-header {
+            margin-bottom: 35px;
+        }
+
+        .modal-title {
+            font-size: 30px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .modal-form {
+            display: flex;
+            flex-direction: column;
+            gap: 22px;
+        }
+
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 22px;
+        }
+
+        .form-select {
+            width: 100%;
+            padding: 16px 20px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-size: 15px;
+            font-family: 'Poppins', sans-serif;
+            cursor: pointer;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .form-select:focus {
+            outline: none;
+            border-color: var(--primary);
+            background: white;
+        }
+
+        .form-select option {
+            padding: 10px;
+        }
+
+        .form-textarea {
+            min-height: 100px;
+            resize: vertical;
+        }
+
+        .modal-actions {
+            display: flex;
+            gap: 15px;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            flex: 1;
+            padding: 18px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border: none;
+            border-radius: 12px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 30px rgba(255, 87, 34, 0.4);
+        }
+
+        .btn-secondary {
+            flex: 1;
+            padding: 18px;
+            background: white;
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            color: var(--text-primary);
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary:hover {
+            background: var(--bg-main);
+            border-color: var(--primary);
+            color: var(--primary);
+        }
+
+        /* Enhanced Dashboard Styles */
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(12, 1fr);
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .stats-row {
+            display: grid;
+            grid-template-columns: repeat(4, 1fr);
+            gap: 25px;
+            margin-bottom: 30px;
+        }
+
+        .stat-card {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .stat-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(46, 58, 135, 0.15);
+        }
+
+        .stat-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 5px;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+        }
+
+        .stat-icon {
+            font-size: 48px;
+            margin-bottom: 15px;
+            opacity: 0.9;
+        }
+
+        .stat-value {
+            font-size: 48px;
+            font-weight: 900;
+            margin-bottom: 8px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .stat-label {
+            color: var(--text-secondary);
+            font-size: 14px;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .chart-container {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .chart-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 25px;
+        }
+
+        .chart-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: var(--primary);
+        }
+
+        .chart-bar {
+            display: flex;
+            align-items: center;
+            margin-bottom: 20px;
+        }
+
+        .chart-label {
+            width: 120px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-primary);
+        }
+
+        .chart-progress {
+            flex: 1;
+            height: 35px;
+            background: var(--bg-main);
+            border-radius: 10px;
+            overflow: hidden;
+            margin-right: 15px;
+            position: relative;
+        }
+
+        .chart-fill {
+            height: 100%;
+            background: linear-gradient(90deg, var(--primary) 0%, var(--accent) 100%);
+            display: flex;
+            align-items: center;
+            justify-content: flex-end;
+            padding-right: 12px;
+            font-size: 13px;
+            font-weight: 700;
+            transition: width 1s ease;
+            color: white;
+        }
+
+        .chart-value {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            min-width: 40px;
+            text-align: right;
+        }
+
+        .progress-ring-container {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 50px;
+            padding: 40px 20px;
+        }
+
+        .progress-ring-wrapper {
+            text-align: center;
+        }
+
+        .progress-ring {
+            position: relative;
+            width: 150px;
+            height: 150px;
+        }
+
+        .progress-ring svg {
+            transform: rotate(-90deg);
+        }
+
+        .progress-ring-circle-bg {
+            fill: none;
+            stroke: var(--bg-main);
+            stroke-width: 12;
+        }
+
+        .progress-ring-circle {
+            fill: none;
+            stroke-width: 12;
+            stroke-linecap: round;
+            transition: stroke-dashoffset 1s ease;
+        }
+
+        .progress-ring-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            font-size: 32px;
+            font-weight: 900;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+        }
+
+        .progress-ring-label {
+            margin-top: 15px;
+            font-size: 14px;
+            font-weight: 700;
+            color: var(--text-secondary);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .recent-projects {
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            padding: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .recent-project-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--bg-main);
+            border-radius: 12px;
+            margin-bottom: 15px;
+            transition: all 0.3s ease;
+        }
+
+        .recent-project-item:hover {
+            background: white;
+            box-shadow: 0 4px 15px rgba(46, 58, 135, 0.1);
+            transform: translateX(5px);
+        }
+
+        .recent-project-icon {
+            font-size: 48px;
+            flex-shrink: 0;
+        }
+
+        .recent-project-info {
+            flex: 1;
+        }
+
+        .recent-project-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 5px;
+        }
+
+        .recent-project-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .recent-project-status {
+            padding: 6px 14px;
+            border-radius: 8px;
+            font-size: 12px;
+            font-weight: 700;
+            text-transform: uppercase;
+        }
+
+        .status-design {
+            background: rgba(255, 107, 53, 0.1);
+            color: var(--accent);
+        }
+
+        .status-production {
+            background: rgba(255, 152, 0, 0.1);
+            color: var(--warning);
+        }
+
+        .status-ready {
+            background: rgba(76, 175, 80, 0.1);
+            color: var(--success);
+        }
+
+        .status-done {
+            background: rgba(46, 58, 135, 0.1);
+            color: var(--primary);
+        }
+
+        /* Timeline Styles */
+        .timeline-container {
+            position: relative;
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 50px;
+        }
+
+        .timeline::before {
+            content: '';
+            position: absolute;
+            left: 20px;
+            top: 0;
+            bottom: 0;
+            width: 4px;
+            background: linear-gradient(180deg, var(--primary) 0%, var(--accent) 100%);
+            border-radius: 2px;
+        }
+
+        .timeline-item {
+            position: relative;
+            margin-bottom: 45px;
+            padding: 30px;
+            background: white;
+            border: 1px solid var(--border);
+            border-radius: 18px;
+            margin-left: 30px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+            transition: all 0.3s ease;
+        }
+
+        .timeline-item:hover {
+            transform: translateX(10px);
+            box-shadow: 0 10px 30px rgba(46, 58, 135, 0.15);
+        }
+
+        .timeline-item::before {
+            content: '';
+            position: absolute;
+            left: -43px;
+            top: 35px;
+            width: 18px;
+            height: 18px;
+            background: var(--accent);
+            border-radius: 50%;
+            border: 4px solid white;
+            box-shadow: 0 0 0 2px var(--accent);
+        }
+
+        .timeline-date {
+            display: inline-block;
+            padding: 8px 16px;
+            background: rgba(255, 87, 34, 0.1);
+            border-radius: 10px;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--accent);
+            margin-bottom: 15px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .timeline-title {
+            font-size: 20px;
+            font-weight: 800;
+            margin-bottom: 10px;
+            color: var(--primary);
+        }
+
+        .timeline-description {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 15px;
+        }
+
+        .empty-state {
+            text-align: center;
+            padding: 100px 40px;
+            color: var(--text-secondary);
+        }
+
+        .empty-icon {
+            font-size: 80px;
+            margin-bottom: 25px;
+            opacity: 0.2;
+        }
+
+        .empty-title {
+            font-size: 26px;
+            font-weight: 800;
+            margin-bottom: 12px;
+            color: var(--text-primary);
+        }
+
+        .empty-description {
+            font-size: 16px;
+        }
+
+        /* Responsive */
+        @media (max-width: 1400px) {
+            .kanban-board {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 1200px) {
+            .stats-row {
+                grid-template-columns: repeat(2, 1fr);
+            }
+        }
+
+        @media (max-width: 768px) {
+            .dashboard {
+                flex-direction: column;
+            }
+            .sidebar {
+                width: 100%;
+                border-right: none;
+                border-bottom: 1px solid var(--border);
+            }
+            .kanban-board {
+                grid-template-columns: 1fr;
+            }
+            .stats-row {
+                grid-template-columns: 1fr;
+            }
+            .form-row {
+                grid-template-columns: 1fr;
+            }
+            .measurement-grid {
+                grid-template-columns: 1fr;
+            }
+            .progress-ring-container {
+                flex-direction: column;
+                gap: 30px;
+            }
+            .detail-modal {
+                width: 95%;
+                padding: 30px;
+            }
+        }
+
+        /* Settings Styles */
+        .settings-tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 30px;
+            border-bottom: 2px solid var(--border);
+        }
+
+        .settings-tab {
+            padding: 16px 32px;
+            background: transparent;
+            border: none;
+            border-bottom: 3px solid transparent;
+            color: var(--text-secondary);
+            font-weight: 700;
+            font-size: 15px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            margin-bottom: -2px;
+        }
+
+        .settings-tab:hover {
+            color: var(--primary);
+            background: var(--bg-main);
+        }
+
+        .settings-tab.active {
+            color: var(--primary);
+            border-bottom-color: var(--primary);
+        }
+
+        .settings-content {
+            background: white;
+            border-radius: 18px;
+            padding: 40px;
+            border: 1px solid var(--border);
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.04);
+        }
+
+        .settings-section {
+            max-width: 800px;
+        }
+
+        .settings-section-header {
+            margin-bottom: 30px;
+        }
+
+        .settings-section-header h3 {
+            font-size: 24px;
+            font-weight: 800;
+            color: var(--primary);
+            margin-bottom: 8px;
+        }
+
+        .settings-section-header p {
+            color: var(--text-secondary);
+            font-size: 15px;
+        }
+
+        .settings-add-form {
+            display: flex;
+            gap: 15px;
+            margin-bottom: 30px;
+        }
+
+        .settings-add-form .form-input {
+            flex: 1;
+        }
+
+        .settings-list {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+        }
+
+        .settings-list-item {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            padding: 20px;
+            background: var(--bg-main);
+            border: 2px solid var(--border);
+            border-radius: 12px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-list-item:hover {
+            background: white;
+            border-color: var(--primary);
+            transform: translateX(5px);
+        }
+
+        .settings-list-item-icon {
+            font-size: 32px;
+            flex-shrink: 0;
+        }
+
+        .settings-list-item-info {
+            flex: 1;
+        }
+
+        .settings-list-item-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: var(--text-primary);
+            margin-bottom: 4px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .settings-list-item-badge {
+            display: inline-block;
+            padding: 3px 10px;
+            background: linear-gradient(135deg, var(--accent) 0%, #E64A19 100%);
+            border-radius: 6px;
+            font-size: 10px;
+            font-weight: 700;
+            text-transform: uppercase;
+            color: white;
+            letter-spacing: 0.5px;
+        }
+
+        .settings-list-item-meta {
+            font-size: 13px;
+            color: var(--text-secondary);
+        }
+
+        .settings-list-item-edit {
+            padding: 10px 20px;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            border: none;
+            border-radius: 8px;
+            color: white;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-list-item-edit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 58, 135, 0.3);
+        }
+
+        .settings-list-item-delete {
+            padding: 10px 16px;
+            background: white;
+            border: 2px solid #E74C3C;
+            border-radius: 8px;
+            color: #E74C3C;
+            font-weight: 700;
+            cursor: pointer;
+            font-size: 13px;
+            transition: all 0.3s ease;
+        }
+
+        .settings-list-item-delete:hover {
+            background: #E74C3C;
+            color: white;
+            transform: translateY(-2px);
+        }
+
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect } = React;
+
+        // Initialize state with localStorage or defaults
+        const getInitialUsers = () => {
+            const stored = localStorage.getItem('artline_users');
+            if (stored) return JSON.parse(stored);
+            return {
+                'artline': { username: 'artline', password: 'artline2026', company: 'ARTLINE', role: 'admin' },
+                'bamo': { username: 'bamo', password: 'bamo123', company: 'BAMO CO.', role: 'viewer' },
+                'confy': { username: 'confy', password: 'confy123', company: 'CONFY', role: 'viewer' },
+                'altunsa': { username: 'altunsa', password: 'altunsa123', company: 'ALTUNSA', role: 'viewer' },
+                'cihan': { username: 'cihan', password: 'cihan123', company: 'CIHAN CO', role: 'viewer' }
+            };
+        };
+
+        const getInitialCompanies = () => {
+            const stored = localStorage.getItem('artline_companies');
+            if (stored) return JSON.parse(stored);
+            return ['BAMO CO.', 'CONFY', 'ALTUNSA', 'CIHAN CO'];
+        };
+
+        const getInitialProjectTypes = () => {
+            const stored = localStorage.getItem('artline_project_types');
+            if (stored) return JSON.parse(stored);
+            return ['Flex', '3D letter', 'GONDOLA', 'Pallet'];
+        };
+
+
+
+        // Logo as base64 data URL
+        const LOGO_DATA_URL = "data:image/webp;base64,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";
+
+        // Mock user database with roles
+        const users = {
+            'artline': { username: 'artline', password: 'artline2026', company: 'ARTLINE', role: 'admin' },
+            'bamo': { username: 'bamo', password: 'bamo123', company: 'BAMO CO.', role: 'viewer' },
+            'confy': { username: 'confy', password: 'confy123', company: 'CONFY', role: 'viewer' },
+            'altunsa': { username: 'altunsa', password: 'altunsa123', company: 'ALTUNSA', role: 'viewer' },
+            'cihan': { username: 'cihan', password: 'cihan123', company: 'CIHAN CO', role: 'viewer' }
+        };
+
+        // Companies managed via state
+
+        // Status flow
+        const statusFlow = {
+            'Design': 'Production',
+            'Production': 'Ready',
+            'Ready': 'Done',
+            'Done': null
+        };
+
+        // Helper function to convert file to base64
+        const fileToBase64 = (file) => {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = () => resolve(reader.result);
+                reader.onerror = error => reject(error);
+            });
+        };
+
+        // Helper function to check if deadline is passed
+        const isOverdue = (deadlineDate) => {
+            if (!deadlineDate) return false;
+            const today = new Date();
+            today.setHours(0, 0, 0, 0);
+            const deadline = new Date(deadlineDate);
+            deadline.setHours(0, 0, 0, 0);
+            return deadline < today;
+        };
+
+        // Helper function to format date
+        const formatDate = (dateString) => {
+            if (!dateString) return '';
+            const date = new Date(dateString);
+            return date.toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' });
+        };
+
+        function App() {
+            const [isLoggedIn, setIsLoggedIn] = useState(false);
+            const [currentUser, setCurrentUser] = useState(null);
+            const [currentView, setCurrentView] = useState('kanban');
+            const [users, setUsers] = useState(getInitialUsers());
+            const [companies, setCompanies] = useState(getInitialCompanies());
+            const [projectTypes, setProjectTypes] = useState(getInitialProjectTypes());
+            
+            const [projects, setProjects] = useState([
+                {
+                    id: 1,
+                    name: 'City Mall Signage',
+                    type: projectTypes[0] || 'Flex',
+                    company: 'BAMO CO.',
+                    address: '123 Main Street, Downtown',
+                    location: 'https://maps.google.com',
+                    status: 'Design',
+                    width: '2.5',
+                    height: '3.0',
+                    depth: '0.5',
+                    recordDate: '2026-01-05',
+                    deadlineDate: '2026-01-25',
+                    attachments: [],
+                    designFiles: []
+                },
+                {
+                    id: 2,
+                    name: 'Restaurant 3D Logo',
+                    type: '3D letter',
+                    company: 'CONFY',
+                    address: '456 Park Avenue',
+                    location: 'https://maps.google.com',
+                    status: 'Production',
+                    width: '1.5',
+                    height: '0.8',
+                    depth: '0.3',
+                    recordDate: '2026-01-03',
+                    deadlineDate: '2026-01-20',
+                    attachments: [],
+                    designFiles: []
+                },
+                {
+                    id: 3,
+                    name: 'Shopping Center Billboard',
+                    type: projectTypes[0] || 'Flex',
+                    company: 'BAMO CO.',
+                    address: '789 Commerce St',
+                    location: 'https://maps.google.com',
+                    status: 'Ready',
+                    width: '5.0',
+                    height: '3.0',
+                    depth: '',
+                    recordDate: '2025-12-28',
+                    deadlineDate: '2026-01-10',
+                    attachments: [],
+                    designFiles: []
+                },
+                {
+                    id: 4,
+                    name: 'Hotel Signage',
+                    type: 'GONDOLA',
+                    company: 'ALTUNSA',
+                    address: '321 Hotel Avenue',
+                    location: 'https://maps.google.com',
+                    status: 'Done',
+                    width: '4.0',
+                    height: '2.5',
+                    depth: '1.0',
+                    recordDate: '2025-12-20',
+                    deadlineDate: '2026-01-05',
+                    attachments: [],
+                    designFiles: []
+                }
+            ]);
+
+            // Save to localStorage
+            useEffect(() => {
+                localStorage.setItem('artline_users', JSON.stringify(users));
+            }, [users]);
+
+            useEffect(() => {
+                localStorage.setItem('artline_companies', JSON.stringify(companies));
+            }, [companies]);
+
+            useEffect(() => {
+                localStorage.setItem('artline_project_types', JSON.stringify(projectTypes));
+            }, [projectTypes]);
+
+            const [showModal, setShowModal] = useState(false);
+            const [showDesignModal, setShowDesignModal] = useState(false);
+            const [showDetailModal, setShowDetailModal] = useState(false);
+            const [selectedProject, setSelectedProject] = useState(null);
+            const [draggedProject, setDraggedProject] = useState(null);
+            const [dragOverColumn, setDragOverColumn] = useState(null);
+
+            const [formData, setFormData] = useState({
+                name: '',
+                type: projectTypes[0] || 'Flex',
+                customType: '',
+                company: companies[0] || '',
+                address: '',
+                location: '',
+                width: '',
+                height: '',
+                depth: '',
+                recordDate: new Date().toISOString().split('T')[0],
+                deadlineDate: '',
+                attachments: []
+            });
+
+            const handleLogin = (username, password) => {
+                const user = users[username.toLowerCase()];
+                if (user && user.password === password) {
+                    setCurrentUser(user);
+                    setIsLoggedIn(true);
+                    return true;
+                }
+                return false;
+            };
+
+            const handleLogout = () => {
+                setIsLoggedIn(false);
+                setCurrentUser(null);
+                setCurrentView('kanban');
+            };
+
+            const handleFileUpload = async (files, isDesign = false) => {
+                const fileArray = Array.from(files);
+                const uploadedFiles = await Promise.all(
+                    fileArray.map(async (file) => {
+                        const base64 = await fileToBase64(file);
+                        return {
+                            name: file.name,
+                            size: file.size,
+                            type: file.type,
+                            data: base64
+                        };
+                    })
+                );
+                
+                if (isDesign && selectedProject) {
+                    setProjects(projects.map(p =>
+                        p.id === selectedProject.id
+                            ? { ...p, designFiles: [...(p.designFiles || []), ...uploadedFiles] }
+                            : p
+                    ));
+                    setShowDesignModal(false);
+                    setSelectedProject(null);
+                } else {
+                    setFormData({
+                        ...formData,
+                        attachments: [...formData.attachments, ...uploadedFiles]
+                    });
+                }
+            };
+
+            const removeAttachment = (index) => {
+                const newAttachments = formData.attachments.filter((_, i) => i !== index);
+                setFormData({ ...formData, attachments: newAttachments });
+            };
+
+            const handleAddProject = () => {
+                const newProject = {
+                    id: Date.now(),
+                    name: formData.name,
+                    type: formData.type === 'Other' ? formData.customType : formData.type,
+                    company: formData.company,
+                    address: formData.address,
+                    location: formData.location,
+                    status: 'Design', // Always starts in Design
+                    width: formData.width,
+                    height: formData.height,
+                    depth: formData.depth,
+                    recordDate: formData.recordDate,
+                    deadlineDate: formData.deadlineDate,
+                    attachments: formData.attachments,
+                    designFiles: []
+                };
+                setProjects([...projects, newProject]);
+                setShowModal(false);
+                setFormData({
+                    name: '',
+                    type: projectTypes[0] || 'Flex',
+                    customType: '',
+                    company: companies[0] || '',
+                    address: '',
+                    location: '',
+                    width: '',
+                    height: '',
+                    depth: '',
+                    recordDate: new Date().toISOString().split('T')[0],
+                    deadlineDate: '',
+                    attachments: []
+                });
+            };
+
+            const moveProjectToNext = (projectId) => {
+                if (currentUser.role !== 'admin') return;
+                setProjects(projects.map(p => {
+                    if (p.id === projectId && statusFlow[p.status]) {
+                        return { ...p, status: statusFlow[p.status] };
+                    }
+                    return p;
+                }));
+            };
+
+            const deleteProject = (projectId) => {
+                if (currentUser.role !== 'admin') return;
+                if (confirm('Are you sure you want to delete this project?')) {
+                    setProjects(projects.filter(p => p.id !== projectId));
+                    setShowDetailModal(false);
+                    setSelectedProject(null);
+                }
+            };
+
+            const handleDragStart = (e, project) => {
+                if (currentUser.role !== 'admin') return;
+                setDraggedProject(project);
+                e.dataTransfer.effectAllowed = 'move';
+            };
+
+            const handleDragOver = (e, status) => {
+                if (currentUser.role !== 'admin') return;
+                e.preventDefault();
+                e.dataTransfer.dropEffect = 'move';
+                setDragOverColumn(status);
+            };
+
+            const handleDragLeave = () => {
+                setDragOverColumn(null);
+            };
+
+            const handleDrop = (e, newStatus) => {
+                if (currentUser.role !== 'admin') return;
+                e.preventDefault();
+                if (draggedProject && draggedProject.status !== newStatus) {
+                    setProjects(projects.map(p => 
+                        p.id === draggedProject.id ? { ...p, status: newStatus } : p
+                    ));
+                }
+                setDraggedProject(null);
+                setDragOverColumn(null);
+            };
+
+            const getProjectsByStatus = (status) => {
+                return projects.filter(p => {
+                    if (p.status !== status) return false;
+                    if (currentUser.role === 'admin') return true;
+                    return p.company === currentUser.company;
+                });
+            };
+
+            const getFilteredProjects = () => {
+                if (currentUser.role === 'admin') return projects;
+                return projects.filter(p => p.company === currentUser.company);
+            };
+
+            const openDetailModal = (project) => {
+                setSelectedProject(project);
+                setShowDetailModal(true);
+            };
+
+            const openDesignModal = (project) => {
+                setSelectedProject(project);
+                setShowDesignModal(true);
+            };
+
+            const downloadFile = (file) => {
+                const link = document.createElement('a');
+                link.href = file.data;
+                link.download = file.name;
+                link.click();
+            };
+
+            const isAdmin = currentUser && currentUser.role === 'admin';
+
+            if (!isLoggedIn) {
+                return <LoginPage onLogin={handleLogin} />;
+            }
+
+            return (
+                <div className="dashboard">
+                    <Sidebar 
+                        currentView={currentView} 
+                        setCurrentView={setCurrentView}
+                        company={currentUser.company}
+                        role={currentUser.role}
+                        onLogout={handleLogout}
+                    />
+                    <div className="main-content">
+                        {currentView === 'kanban' && (
+                            <KanbanBoard 
+                                projects={projects}
+                                getProjectsByStatus={getProjectsByStatus}
+                                setShowModal={setShowModal}
+                                moveProjectToNext={moveProjectToNext}
+                                deleteProject={deleteProject}
+                                handleDragStart={handleDragStart}
+                                handleDragOver={handleDragOver}
+                                handleDragLeave={handleDragLeave}
+                                handleDrop={handleDrop}
+                                draggedProject={draggedProject}
+                                dragOverColumn={dragOverColumn}
+                                isAdmin={isAdmin}
+                                openDetailModal={openDetailModal}
+                                openDesignModal={openDesignModal}
+                                downloadFile={downloadFile}
+                            />
+                        )}
+                        {currentView === 'dashboard' && (
+                            <Dashboard 
+                                projects={getFilteredProjects()} 
+                                isAdmin={isAdmin}
+                                company={currentUser.company}
+                            />
+                        )}
+                        {currentView === 'timeline' && (
+                            <Timeline projects={getFilteredProjects()} />
+                        )}
+                        {currentView === 'settings' && isAdmin && (
+                            <Settings 
+                                users={users}
+                                setUsers={setUsers}
+                                companies={companies}
+                                setCompanies={setCompanies}
+                                projectTypes={projectTypes}
+                                setProjectTypes={setProjectTypes}
+                            />
+                        )}
+                    </div>
+                    {showModal && (
+                        <ProjectModal 
+                            formData={formData}
+                            setFormData={setFormData}
+                            onClose={() => setShowModal(false)}
+                            onSubmit={handleAddProject}
+                            handleFileUpload={handleFileUpload}
+                            removeAttachment={removeAttachment}
+                            companies={companies}
+                            projectTypes={projectTypes}
+                        />
+                    )}
+                    {showDesignModal && selectedProject && (
+                        <DesignModal
+                            project={selectedProject}
+                            onClose={() => {
+                                setShowDesignModal(false);
+                                setSelectedProject(null);
+                            }}
+                            handleFileUpload={handleFileUpload}
+                        />
+                    )}
+                    {showDetailModal && selectedProject && (
+                        <ProjectDetailModal
+                            project={selectedProject}
+                            onClose={() => {
+                                setShowDetailModal(false);
+                                setSelectedProject(null);
+                            }}
+                            moveProjectToNext={moveProjectToNext}
+                            deleteProject={deleteProject}
+                            openDesignModal={openDesignModal}
+                            downloadFile={downloadFile}
+                            isAdmin={isAdmin}
+                        />
+                    )}
+                </div>
+            );
+        }
+
+        function LoginPage({ onLogin }) {
+            const [username, setUsername] = useState('');
+            const [password, setPassword] = useState('');
+            const [error, setError] = useState('');
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                if (onLogin(username, password)) {
+                    setError('');
+                } else {
+                    setError('Invalid username or password');
+                }
+            };
+
+            return (
+                <div className="login-container">
+                    <div className="login-box">
+                        <div className="login-header">
+                            <img src={LOGO_DATA_URL} alt="ARTLINE Logo" className="login-logo" />
+                            <div className="login-subtitle">Project Management System</div>
+                        </div>
+                        <form onSubmit={handleSubmit}>
+                            <div className="form-group">
+                                <label className="form-label">Username</label>
+                                <input 
+                                    type="text"
+                                    className="form-input"
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                    placeholder="Enter your username"
+                                />
+                            </div>
+                            <div className="form-group">
+                                <label className="form-label">Password</label>
+                                <input 
+                                    type="password"
+                                    className="form-input"
+                                    value={password}
+                                    onChange={(e) => setPassword(e.target.value)}
+                                    placeholder="Enter your password"
+                                />
+                            </div>
+                            {error && <div className="error-message">{error}</div>}
+                            <button type="submit" className="login-button">
+                                Sign In
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        function Sidebar({ currentView, setCurrentView, company, role, onLogout }) {
+            const navItems = [
+                { id: 'kanban', label: 'Kanban Board', icon: '📋' },
+                { id: 'dashboard', label: 'Dashboard', icon: '📊' },
+                { id: 'timeline', label: 'Timeline', icon: '⏱️' }
+            ];
+
+            // Add settings for admin only
+            if (role === 'admin') {
+                navItems.push({ id: 'settings', label: 'Settings', icon: '⚙️' });
+            }
+
+            return (
+                <div className="sidebar">
+                    <div className="sidebar-header">
+                        <img src={LOGO_DATA_URL} alt="ARTLINE Logo" className="sidebar-logo-img" />
+                        <div className="company-name">{company}</div>
+                        <div className={`user-role-badge ${role === 'viewer' ? 'viewer' : ''}`}>
+                            {role === 'admin' ? '👑 Administrator' : '👁️ Viewer'}
+                        </div>
+                    </div>
+                    <div className="sidebar-nav">
+                        {navItems.map(item => (
+                            <div 
+                                key={item.id}
+                                className={`nav-item ${currentView === item.id ? 'active' : ''}`}
+                                onClick={() => setCurrentView(item.id)}
+                            >
+                                <span className="nav-icon">{item.icon}</span>
+                                {item.label}
+                            </div>
+                        ))}
+                    </div>
+                    <div className="sidebar-footer">
+                        <button className="logout-button" onClick={onLogout}>
+                            Logout
+                        </button>
+                    </div>
+                </div>
+            );
+        }
+
+        function KanbanBoard({ 
+            projects, 
+            getProjectsByStatus, 
+            setShowModal, 
+            handleDragStart,
+            handleDragOver,
+            handleDragLeave,
+            handleDrop,
+            draggedProject,
+            dragOverColumn,
+            isAdmin,
+            openDetailModal
+        }) {
+            const columns = [
+                { id: 'Design', title: 'Design', color: '#FF6B35' },
+                { id: 'Production', title: 'Production', color: '#F7B801' },
+                { id: 'Ready', title: 'Ready Projects', color: '#06D6A0' },
+                { id: 'Done', title: 'Done', color: '#004E89' }
+            ];
+
+            return (
+                <>
+                    <div className="content-header">
+                        <div className="page-title">Kanban Board</div>
+                        <div className="page-subtitle">Manage your advertisement projects</div>
+                    </div>
+                    
+                    {!isAdmin && (
+                        <div className="view-only-notice">
+                            <div className="view-only-notice-icon">👁️</div>
+                            <div className="view-only-notice-text">
+                                <div className="view-only-notice-title">View-Only Mode</div>
+                                <div className="view-only-notice-description">
+                                    You can view your company's projects. Click on any project to see details. Contact ARTLINE admin for changes.
+                                </div>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="kanban-header">
+                        <div></div>
+                        <button 
+                            className="add-project-button" 
+                            onClick={() => setShowModal(true)}
+                            disabled={!isAdmin}
+                        >
+                            <span>+</span> Create New Project
+                        </button>
+                    </div>
+                    <div className="kanban-board">
+                        {columns.map(column => {
+                            const columnProjects = getProjectsByStatus(column.id);
+                            return (
+                                <div 
+                                    key={column.id} 
+                                    className={`kanban-column ${dragOverColumn === column.id && isAdmin ? 'drag-over' : ''}`}
+                                    onDragOver={(e) => handleDragOver(e, column.id)}
+                                    onDragLeave={handleDragLeave}
+                                    onDrop={(e) => handleDrop(e, column.id)}
+                                >
+                                    <div className="column-header">
+                                        <div className="column-title" style={{ color: column.color }}>
+                                            {column.title}
+                                        </div>
+                                        <div className="column-count">{columnProjects.length}</div>
+                                    </div>
+                                    {columnProjects.length === 0 ? (
+                                        <div className="empty-state">
+                                            <div className="empty-icon">📦</div>
+                                            <div className="empty-description">No projects yet</div>
+                                        </div>
+                                    ) : (
+                                        columnProjects.map(project => (
+                                            <div 
+                                                key={project.id} 
+                                                className={`project-card ${isAdmin ? 'draggable' : 'view-only'} ${draggedProject?.id === project.id ? 'dragging' : ''}`}
+                                                draggable={isAdmin}
+                                                onDragStart={(e) => handleDragStart(e, project)}
+                                                onClick={() => openDetailModal(project)}
+                                            >
+                                                <div className="project-card-name">{project.name}</div>
+                                                <div className="project-card-type">{project.type}</div>
+                                                <div className="project-card-company">{project.company}</div>
+                                            </div>
+                                        ))
+                                    )}
+                                </div>
+                            );
+                        })}
+                    </div>
+                </>
+            );
+        }
+
+        function ProjectModal({ formData, setFormData, onClose, onSubmit, handleFileUpload, removeAttachment, companies, projectTypes }) {
+            const fileInputRef = React.useRef(null);
+
+            const handleSubmit = (e) => {
+                e.preventDefault();
+                onSubmit();
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="modal-header">
+                            <div className="modal-title">Create New Project</div>
+                        </div>
+                        <form onSubmit={handleSubmit} className="modal-form">
+                            <div className="form-group">
+                                <label className="form-label">Project Name</label>
+                                <input 
+                                    type="text"
+                                    className="form-input"
+                                    value={formData.name}
+                                    onChange={(e) => setFormData({...formData, name: e.target.value})}
+                                    placeholder="Enter project name"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label className="form-label">Company</label>
+                                    <select 
+                                        className="form-select"
+                                        value={formData.company}
+                                        onChange={(e) => setFormData({...formData, company: e.target.value})}
+                                    >
+                                        {companies.map(company => (
+                                            <option key={company} value={company}>{company}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Project Type</label>
+                                    <select 
+                                        className="form-select"
+                                        value={formData.type}
+                                        onChange={(e) => setFormData({...formData, type: e.target.value})}
+                                    >
+                                        {projectTypes.map(type => (
+                                            <option key={type} value={type}>{type}</option>
+                                        ))}
+                                        <option value="Other">Other</option>
+                                    </select>
+                                </div>
+                            </div>
+
+                            {formData.type === 'Other' && (
+                                <div className="form-group">
+                                    <label className="form-label">Custom Type</label>
+                                    <input 
+                                        type="text"
+                                        className="form-input"
+                                        value={formData.customType}
+                                        onChange={(e) => setFormData({...formData, customType: e.target.value})}
+                                        placeholder="Enter custom type"
+                                        required
+                                    />
+                                </div>
+                            )}
+
+                            <div className="form-row">
+                                <div className="form-group">
+                                    <label className="form-label">Record Date</label>
+                                    <input 
+                                        type="date"
+                                        className="form-input"
+                                        value={formData.recordDate}
+                                        onChange={(e) => setFormData({...formData, recordDate: e.target.value})}
+                                        required
+                                    />
+                                </div>
+
+                                <div className="form-group">
+                                    <label className="form-label">Deadline Date</label>
+                                    <input 
+                                        type="date"
+                                        className="form-input"
+                                        value={formData.deadlineDate}
+                                        onChange={(e) => setFormData({...formData, deadlineDate: e.target.value})}
+                                        required
+                                    />
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Measurements</label>
+                                <div className="measurement-grid">
+                                    <div>
+                                        <input 
+                                            type="number"
+                                            step="0.01"
+                                            className="form-input form-input-small"
+                                            value={formData.width}
+                                            onChange={(e) => setFormData({...formData, width: e.target.value})}
+                                            placeholder="Width (m)"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <input 
+                                            type="number"
+                                            step="0.01"
+                                            className="form-input form-input-small"
+                                            value={formData.height}
+                                            onChange={(e) => setFormData({...formData, height: e.target.value})}
+                                            placeholder="Height (m)"
+                                            required
+                                        />
+                                    </div>
+                                    <div>
+                                        <input 
+                                            type="number"
+                                            step="0.01"
+                                            className="form-input form-input-small"
+                                            value={formData.depth}
+                                            onChange={(e) => setFormData({...formData, depth: e.target.value})}
+                                            placeholder="Depth (m)"
+                                        />
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Address</label>
+                                <input 
+                                    type="text"
+                                    className="form-input"
+                                    value={formData.address}
+                                    onChange={(e) => setFormData({...formData, address: e.target.value})}
+                                    placeholder="Enter project address"
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">Location Link (Google Maps)</label>
+                                <input 
+                                    type="url"
+                                    className="form-input"
+                                    value={formData.location}
+                                    onChange={(e) => setFormData({...formData, location: e.target.value})}
+                                    placeholder="https://maps.google.com/..."
+                                    required
+                                />
+                            </div>
+
+                            <div className="form-group">
+                                <label className="form-label">
+                                    Attachments <span className="form-label-optional">(Photos or PDFs)</span>
+                                </label>
+                                <div className="file-upload-area" onClick={() => fileInputRef.current.click()}>
+                                    <div className="file-upload-icon">📁</div>
+                                    <div className="file-upload-text">
+                                        Click to upload files or drag and drop
+                                    </div>
+                                </div>
+                                <input 
+                                    ref={fileInputRef}
+                                    type="file"
+                                    className="file-upload-input"
+                                    multiple
+                                    accept="image/*,.pdf"
+                                    onChange={(e) => handleFileUpload(e.target.files)}
+                                />
+                                {formData.attachments.map((file, idx) => (
+                                    <div key={idx} className="uploaded-file">
+                                        <span className="uploaded-file-icon">
+                                            {file.type.startsWith('image/') ? '🖼️' : '📄'}
+                                        </span>
+                                        <div className="uploaded-file-info">
+                                            <div className="uploaded-file-name">{file.name}</div>
+                                            <div className="uploaded-file-size">
+                                                {(file.size / 1024).toFixed(2)} KB
+                                            </div>
+                                        </div>
+                                        <button 
+                                            type="button"
+                                            className="uploaded-file-remove"
+                                            onClick={() => removeAttachment(idx)}
+                                        >
+                                            ×
+                                        </button>
+                                    </div>
+                                ))}
+                            </div>
+
+                            <div className="modal-actions">
+                                <button type="submit" className="btn-primary">
+                                    Create Project
+                                </button>
+                                <button type="button" className="btn-secondary" onClick={onClose}>
+                                    Cancel
+                                </button>
+                            </div>
+                        </form>
+                    </div>
+                </div>
+            );
+        }
+
+        function DesignModal({ project, onClose, handleFileUpload }) {
+            const fileInputRef = React.useRef(null);
+
+            const handleFiles = (files) => {
+                handleFileUpload(files, true);
+            };
+
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: '500px'}}>
+                        <div className="modal-header">
+                            <div className="modal-title">Add Design Files</div>
+                            <div style={{fontSize: '14px', color: 'var(--text-secondary)', marginTop: '10px'}}>
+                                {project.name}
+                            </div>
+                        </div>
+                        <div className="form-group">
+                            <label className="form-label">Upload Design Files</label>
+                            <div className="file-upload-area" onClick={() => fileInputRef.current.click()}>
+                                <div className="file-upload-icon">🎨</div>
+                                <div className="file-upload-text">
+                                    Click to upload design files (Images or PDFs)
+                                </div>
+                            </div>
+                            <input 
+                                ref={fileInputRef}
+                                type="file"
+                                className="file-upload-input"
+                                multiple
+                                accept="image/*,.pdf"
+                                onChange={(e) => handleFiles(e.target.files)}
+                            />
+                        </div>
+                        <div className="modal-actions">
+                            <button type="button" className="btn-secondary" onClick={onClose} style={{flex: '1'}}>
+                                Close
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            );
+        }
+
+        function ProjectDetailModal({ project, onClose, moveProjectToNext, deleteProject, openDesignModal, downloadFile, isAdmin }) {
+            return (
+                <div className="modal-overlay" onClick={onClose}>
+                    <div className="detail-modal" onClick={(e) => e.stopPropagation()}>
+                        <div className="detail-header">
+                            <div className="detail-title-section">
+                                <div className="detail-title">{project.name}</div>
+                                <div className="detail-badges">
+                                    <span className="detail-company">{project.company}</span>
+                                    <span className="detail-type">{project.type}</span>
+                                </div>
+                            </div>
+                            <button className="detail-close" onClick={onClose}>×</button>
+                        </div>
+
+                        <div className="detail-section">
+                            <div className="detail-section-title">📅 Dates</div>
+                            <div className="detail-info-grid">
+                                <div className="detail-info-item">
+                                    <div className="detail-info-label">Record Date</div>
+                                    <div className="detail-info-value">{formatDate(project.recordDate)}</div>
+                                </div>
+                                <div className="detail-info-item">
+                                    <div className="detail-info-label">Deadline</div>
+                                    <div className="detail-info-value" style={{color: isOverdue(project.deadlineDate) ? '#E74C3C' : 'inherit'}}>
+                                        {formatDate(project.deadlineDate)}
+                                        {isOverdue(project.deadlineDate) && ' (Overdue)'}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="detail-section">
+                            <div className="detail-section-title">📏 Measurements</div>
+                            <div className="detail-info-grid">
+                                <div className="detail-info-item">
+                                    <div className="detail-info-label">Dimensions</div>
+                                    <div className="detail-info-value">
+                                        {project.width}m × {project.height}m {project.depth && `× ${project.depth}m`}
+                                    </div>
+                                </div>
+                                <div className="detail-info-item">
+                                    <div className="detail-info-label">Status</div>
+                                    <div className="detail-info-value">{project.status}</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="detail-section">
+                            <div className="detail-section-title">📍 Location</div>
+                            <div className="detail-info-grid">
+                                <div className="detail-info-item" style={{gridColumn: '1 / -1'}}>
+                                    <div className="detail-info-label">Address</div>
+                                    <div className="detail-info-value">{project.address}</div>
+                                </div>
+                                <div className="detail-info-item" style={{gridColumn: '1 / -1'}}>
+                                    <div className="detail-info-label">Map Link</div>
+                                    <a href={project.location} target="_blank" rel="noopener noreferrer" className="detail-info-link">
+                                        🗺️ Open in Google Maps
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+
+                        {((project.attachments && project.attachments.length > 0) || 
+                          (project.designFiles && project.designFiles.length > 0)) && (
+                            <div className="detail-section">
+                                <div className="detail-section-title">📎 Attachments</div>
+                                <div className="detail-attachments">
+                                    {project.attachments?.map((file, idx) => (
+                                        <div key={idx} className="detail-attachment" onClick={() => downloadFile(file)}>
+                                            {file.type.startsWith('image/') ? '🖼️' : '📄'} {file.name}
+                                        </div>
+                                    ))}
+                                    {project.designFiles?.map((file, idx) => (
+                                        <div key={`design-${idx}`} className="detail-attachment" onClick={() => downloadFile(file)}>
+                                            🎨 {file.name}
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {isAdmin && (
+                            <div className="detail-actions">
+                                {project.status === 'Design' && (
+                                    <button 
+                                        className="btn-add-design"
+                                        onClick={() => {
+                                            onClose();
+                                            openDesignModal(project);
+                                        }}
+                                    >
+                                        🎨 Add Design Files
+                                    </button>
+                                )}
+                                <button 
+                                    className="btn-next"
+                                    onClick={() => moveProjectToNext(project.id)}
+                                    disabled={!statusFlow[project.status]}
+                                >
+                                    {statusFlow[project.status] ? `Move to ${statusFlow[project.status]} →` : '✓ Completed'}
+                                </button>
+                                <button 
+                                    className="btn-delete"
+                                    onClick={() => deleteProject(project.id)}
+                                >
+                                    🗑️ Delete
+                                </button>
+                            </div>
+                        )}
+                    </div>
+                </div>
+            );
+        }
+
+        function Dashboard({ projects, isAdmin, company }) {
+            const stats = {
+                total: projects.length,
+                design: projects.filter(p => p.status === 'Design').length,
+                production: projects.filter(p => p.status === 'Production').length,
+                ready: projects.filter(p => p.status === 'Ready').length,
+                done: projects.filter(p => p.status === 'Done').length
+            };
+
+            const typeStats = {
+                'Flex': projects.filter(p => p.type === 'Flex').length,
+                '3D letter': projects.filter(p => p.type === '3D letter').length,
+                'GONDOLA': projects.filter(p => p.type === 'GONDOLA').length,
+                'Pallet': projects.filter(p => p.type === 'Pallet').length
+            };
+
+            const recentProjects = [...projects].sort((a, b) => b.id - a.id).slice(0, 5);
+
+            const completionRate = stats.total > 0 ? Math.round((stats.done / stats.total) * 100) : 0;
+            const inProgressRate = stats.total > 0 ? Math.round(((stats.production + stats.ready) / stats.total) * 100) : 0;
+
+            const circumference = 2 * Math.PI * 60;
+
+            return (
+                <>
+                    <div className="content-header">
+                        <div className="page-title">
+                            {isAdmin ? 'Admin Dashboard' : `${company} Dashboard`}
+                        </div>
+                        <div className="page-subtitle">
+                            {isAdmin ? 'Overview of all projects across companies' : 'Your project statistics and progress'}
+                        </div>
+                    </div>
+
+                    <div className="stats-row">
+                        <div className="stat-card">
+                            <div className="stat-icon">📦</div>
+                            <div className="stat-value">{stats.total}</div>
+                            <div className="stat-label">Total Projects</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon">✏️</div>
+                            <div className="stat-value">{stats.design}</div>
+                            <div className="stat-label">In Design</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon">⚙️</div>
+                            <div className="stat-value">{stats.production}</div>
+                            <div className="stat-label">In Production</div>
+                        </div>
+                        <div className="stat-card">
+                            <div className="stat-icon">✅</div>
+                            <div className="stat-value">{stats.done}</div>
+                            <div className="stat-label">Completed</div>
+                        </div>
+                    </div>
+
+                    <div style={{display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '25px', marginBottom: '30px'}}>
+                        <div className="chart-container">
+                            <div className="chart-header">
+                                <div className="chart-title">Project Completion Status</div>
+                            </div>
+                            <div className="progress-ring-container">
+                                <div className="progress-ring-wrapper">
+                                    <div className="progress-ring">
+                                        <svg width="150" height="150">
+                                            <circle 
+                                                className="progress-ring-circle-bg"
+                                                cx="75"
+                                                cy="75"
+                                                r="60"
+                                            />
+                                            <circle 
+                                                className="progress-ring-circle"
+                                                cx="75"
+                                                cy="75"
+                                                r="60"
+                                                stroke="url(#gradient1)"
+                                                strokeDasharray={circumference}
+                                                strokeDashoffset={circumference - (completionRate / 100) * circumference}
+                                            />
+                                            <defs>
+                                                <linearGradient id="gradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#2E3A87" />
+                                                    <stop offset="100%" stopColor="#FF5722" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div className="progress-ring-text">{completionRate}%</div>
+                                    </div>
+                                    <div className="progress-ring-label">Completion Rate</div>
+                                </div>
+
+                                <div className="progress-ring-wrapper">
+                                    <div className="progress-ring">
+                                        <svg width="150" height="150">
+                                            <circle 
+                                                className="progress-ring-circle-bg"
+                                                cx="75"
+                                                cy="75"
+                                                r="60"
+                                            />
+                                            <circle 
+                                                className="progress-ring-circle"
+                                                cx="75"
+                                                cy="75"
+                                                r="60"
+                                                stroke="url(#gradient2)"
+                                                strokeDasharray={circumference}
+                                                strokeDashoffset={circumference - (inProgressRate / 100) * circumference}
+                                            />
+                                            <defs>
+                                                <linearGradient id="gradient2" x1="0%" y1="0%" x2="100%" y2="100%">
+                                                    <stop offset="0%" stopColor="#FF9800" />
+                                                    <stop offset="100%" stopColor="#4CAF50" />
+                                                </linearGradient>
+                                            </defs>
+                                        </svg>
+                                        <div className="progress-ring-text">{inProgressRate}%</div>
+                                    </div>
+                                    <div className="progress-ring-label">In Progress</div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div className="chart-container">
+                            <div className="chart-header">
+                                <div className="chart-title">Projects by Type</div>
+                            </div>
+                            {Object.entries(typeStats).map(([type, count]) => (
+                                <div key={type} className="chart-bar">
+                                    <div className="chart-label">{type}</div>
+                                    <div className="chart-progress">
+                                        <div 
+                                            className="chart-fill" 
+                                            style={{ width: `${stats.total > 0 ? (count / stats.total) * 100 : 0}%` }}
+                                        >
+                                        </div>
+                                    </div>
+                                    <div className="chart-value">{count}</div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+
+                    <div className="recent-projects">
+                        <div className="chart-header">
+                            <div className="chart-title">Recent Projects</div>
+                        </div>
+                        {recentProjects.length === 0 ? (
+                            <div className="empty-state">
+                                <div className="empty-icon">📋</div>
+                                <div className="empty-title">No Projects Yet</div>
+                                <div className="empty-description">
+                                    {isAdmin ? 'Start by creating your first project' : 'No projects assigned to your company yet'}
+                                </div>
+                            </div>
+                        ) : (
+                            recentProjects.map(project => (
+                                <div key={project.id} className="recent-project-item">
+                                    <div className="recent-project-icon">
+                                        {project.type === 'Flex' ? '📰' : 
+                                         project.type === '3D letter' ? '🔤' : 
+                                         project.type === 'GONDOLA' ? '🏪' : '📦'}
+                                    </div>
+                                    <div className="recent-project-info">
+                                        <div className="recent-project-name">{project.name}</div>
+                                        <div className="recent-project-meta">
+                                            {isAdmin && `${project.company} • `}
+                                            {project.type} • {project.address}
+                                            {project.deadlineDate && ` • Deadline: ${formatDate(project.deadlineDate)}`}
+                                        </div>
+                                    </div>
+                                    <div className={`recent-project-status status-${project.status.toLowerCase()}`}>
+                                        {project.status}
+                                    </div>
+                                </div>
+                            ))
+                        )}
+                    </div>
+                </>
+            );
+        }
+
+        function Timeline({ projects }) {
+            const sortedProjects = [...projects].sort((a, b) => b.id - a.id);
+
+            return (
+                <>
+                    <div className="content-header">
+                        <div className="page-title">Timeline</div>
+                        <div className="page-subtitle">Project activity timeline</div>
+                    </div>
+                    <div className="timeline-container">
+                        <div className="timeline">
+                            {sortedProjects.map((project, index) => (
+                                <div key={project.id} className="timeline-item">
+                                    <div className="timeline-date">
+                                        {formatDate(project.recordDate || new Date(project.id).toISOString().split('T')[0])}
+                                    </div>
+                                    <div className="timeline-title">
+                                        {project.name} - {project.status}
+                                    </div>
+                                    <div className="timeline-description">
+                                        Company: {project.company} | Type: {project.type} | Location: {project.address}
+                                        {project.deadlineDate && ` | Deadline: ${formatDate(project.deadlineDate)}`}
+                                    </div>
+                                </div>
+                            ))}
+                        </div>
+                    </div>
+                </>
+            );
+        }
+
+        // Settings Component
+        function Settings({ users, setUsers, companies, setCompanies, projectTypes, setProjectTypes }) {
+            const [activeTab, setActiveTab] = useState('companies');
+            const [editingUser, setEditingUser] = useState(null);
+            const [newCompany, setNewCompany] = useState('');
+            const [newProjectType, setNewProjectType] = useState('');
+
+            const handleAddCompany = () => {
+                if (newCompany.trim() && !companies.includes(newCompany.trim())) {
+                    setCompanies([...companies, newCompany.trim()]);
+                    setNewCompany('');
+                }
+            };
+
+            const handleRemoveCompany = (company) => {
+                if (confirm(`Remove ${company}? This will not delete existing projects.`)) {
+                    setCompanies(companies.filter(c => c !== company));
+                }
+            };
+
+            const handleAddProjectType = () => {
+                if (newProjectType.trim() && !projectTypes.includes(newProjectType.trim())) {
+                    setProjectTypes([...projectTypes, newProjectType.trim()]);
+                    setNewProjectType('');
+                }
+            };
+
+            const handleRemoveProjectType = (type) => {
+                if (confirm(`Remove ${type} project type?`)) {
+                    setProjectTypes(projectTypes.filter(t => t !== type));
+                }
+            };
+
+            const handleEditUser = (username) => {
+                setEditingUser({
+                    username: username,
+                    password: users[username].password,
+                    company: users[username].company,
+                    role: users[username].role,
+                    isNew: false
+                });
+            };
+
+            const handleSaveUser = () => {
+                if (editingUser) {
+                    const newUsers = { ...users };
+                    if (editingUser.isNew) {
+                        if (users[editingUser.username.toLowerCase()]) {
+                            alert('Username already exists!');
+                            return;
+                        }
+                        newUsers[editingUser.username.toLowerCase()] = {
+                            username: editingUser.username.toLowerCase(),
+                            password: editingUser.password,
+                            company: editingUser.company,
+                            role: editingUser.role
+                        };
+                    } else {
+                        newUsers[editingUser.username] = {
+                            username: editingUser.username,
+                            password: editingUser.password,
+                            company: editingUser.company,
+                            role: editingUser.role
+                        };
+                    }
+                    setUsers(newUsers);
+                    setEditingUser(null);
+                }
+            };
+
+            const handleAddUser = () => {
+                setEditingUser({
+                    username: '',
+                    password: '',
+                    company: companies[0],
+                    role: 'viewer',
+                    isNew: true
+                });
+            };
+
+            const handleDeleteUser = (username) => {
+                if (username === 'artline') {
+                    alert('Cannot delete the main admin account!');
+                    return;
+                }
+                if (confirm(`Delete user ${username}?`)) {
+                    const newUsers = { ...users };
+                    delete newUsers[username];
+                    setUsers(newUsers);
+                }
+            };
+
+            return (
+                <>
+                    <div className="content-header">
+                        <div className="page-title">Settings</div>
+                        <div className="page-subtitle">Manage system configuration</div>
+                    </div>
+
+                    <div className="settings-tabs">
+                        <button 
+                            className={`settings-tab ${activeTab === 'companies' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('companies')}
+                        >
+                            🏢 Companies
+                        </button>
+                        <button 
+                            className={`settings-tab ${activeTab === 'types' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('types')}
+                        >
+                            📋 Project Types
+                        </button>
+                        <button 
+                            className={`settings-tab ${activeTab === 'users' ? 'active' : ''}`}
+                            onClick={() => setActiveTab('users')}
+                        >
+                            👥 Users
+                        </button>
+                    </div>
+
+                    <div className="settings-content">
+                        {activeTab === 'companies' && (
+                            <div className="settings-section">
+                                <div className="settings-section-header">
+                                    <h3>Manage Companies</h3>
+                                    <p>Add or remove companies that can be assigned to projects</p>
+                                </div>
+                                
+                                <div className="settings-add-form">
+                                    <input 
+                                        type="text"
+                                        className="form-input"
+                                        value={newCompany}
+                                        onChange={(e) => setNewCompany(e.target.value)}
+                                        placeholder="Enter company name"
+                                        onKeyPress={(e) => e.key === 'Enter' && handleAddCompany()}
+                                    />
+                                    <button className="btn-primary" onClick={handleAddCompany}>
+                                        + Add Company
+                                    </button>
+                                </div>
+
+                                <div className="settings-list">
+                                    {companies.map(company => (
+                                        <div key={company} className="settings-list-item">
+                                            <div className="settings-list-item-icon">🏢</div>
+                                            <div className="settings-list-item-info">
+                                                <div className="settings-list-item-name">{company}</div>
+                                            </div>
+                                            <button 
+                                                className="settings-list-item-delete"
+                                                onClick={() => handleRemoveCompany(company)}
+                                            >
+                                                🗑️ Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'types' && (
+                            <div className="settings-section">
+                                <div className="settings-section-header">
+                                    <h3>Manage Project Types</h3>
+                                    <p>Add or remove project types available when creating projects</p>
+                                </div>
+                                
+                                <div className="settings-add-form">
+                                    <input 
+                                        type="text"
+                                        className="form-input"
+                                        value={newProjectType}
+                                        onChange={(e) => setNewProjectType(e.target.value)}
+                                        placeholder="Enter project type"
+                                        onKeyPress={(e) => e.key === 'Enter' && handleAddProjectType()}
+                                    />
+                                    <button className="btn-primary" onClick={handleAddProjectType}>
+                                        + Add Type
+                                    </button>
+                                </div>
+
+                                <div className="settings-list">
+                                    {projectTypes.map(type => (
+                                        <div key={type} className="settings-list-item">
+                                            <div className="settings-list-item-icon">📋</div>
+                                            <div className="settings-list-item-info">
+                                                <div className="settings-list-item-name">{type}</div>
+                                            </div>
+                                            <button 
+                                                className="settings-list-item-delete"
+                                                onClick={() => handleRemoveProjectType(type)}
+                                            >
+                                                🗑️ Remove
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {activeTab === 'users' && (
+                            <div className="settings-section">
+                                <div className="settings-section-header">
+                                    <h3>Manage Users</h3>
+                                    <p>Add users, change passwords, and manage access</p>
+                                </div>
+                                
+                                <button className="btn-primary" onClick={handleAddUser} style={{marginBottom: '20px'}}>
+                                    + Add New User
+                                </button>
+
+                                <div className="settings-list">
+                                    {Object.values(users).map(user => (
+                                        <div key={user.username} className="settings-list-item">
+                                            <div className="settings-list-item-icon">
+                                                {user.role === 'admin' ? '👑' : '👤'}
+                                            </div>
+                                            <div className="settings-list-item-info">
+                                                <div className="settings-list-item-name">
+                                                    {user.username}
+                                                    <span className="settings-list-item-badge">
+                                                        {user.role === 'admin' ? 'Admin' : 'Viewer'}
+                                                    </span>
+                                                </div>
+                                                <div className="settings-list-item-meta">
+                                                    {user.company}
+                                                </div>
+                                            </div>
+                                            <div style={{display: 'flex', gap: '10px'}}>
+                                                <button 
+                                                    className="settings-list-item-edit"
+                                                    onClick={() => handleEditUser(user.username)}
+                                                >
+                                                    ✏️ Edit
+                                                </button>
+                                                {user.username !== 'artline' && (
+                                                    <button 
+                                                        className="settings-list-item-delete"
+                                                        onClick={() => handleDeleteUser(user.username)}
+                                                    >
+                                                        🗑️ Delete
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+                    </div>
+
+                    {editingUser && (
+                        <div className="modal-overlay" onClick={() => setEditingUser(null)}>
+                            <div className="modal" onClick={(e) => e.stopPropagation()} style={{maxWidth: '500px'}}>
+                                <div className="modal-header">
+                                    <div className="modal-title">
+                                        {editingUser.isNew ? 'Add New User' : 'Edit User'}
+                                    </div>
+                                </div>
+                                <div className="modal-form">
+                                    <div className="form-group">
+                                        <label className="form-label">Username</label>
+                                        <input 
+                                            type="text"
+                                            className="form-input"
+                                            value={editingUser.username}
+                                            onChange={(e) => setEditingUser({...editingUser, username: e.target.value})}
+                                            placeholder="Enter username"
+                                            disabled={!editingUser.isNew}
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Password</label>
+                                        <input 
+                                            type="text"
+                                            className="form-input"
+                                            value={editingUser.password}
+                                            onChange={(e) => setEditingUser({...editingUser, password: e.target.value})}
+                                            placeholder="Enter password"
+                                        />
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Company</label>
+                                        <select 
+                                            className="form-select"
+                                            value={editingUser.company}
+                                            onChange={(e) => setEditingUser({...editingUser, company: e.target.value})}
+                                        >
+                                            {companies.map(company => (
+                                                <option key={company} value={company}>{company}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div className="form-group">
+                                        <label className="form-label">Role</label>
+                                        <select 
+                                            className="form-select"
+                                            value={editingUser.role}
+                                            onChange={(e) => setEditingUser({...editingUser, role: e.target.value})}
+                                            disabled={editingUser.username === 'artline'}
+                                        >
+                                            <option value="viewer">Viewer</option>
+                                            <option value="admin">Admin</option>
+                                        </select>
+                                    </div>
+                                </div>
+                                <div className="modal-actions">
+                                    <button 
+                                        className="btn-primary" 
+                                        onClick={handleSaveUser}
+                                    >
+                                        Save
+                                    </button>
+                                    <button className="btn-secondary" onClick={() => setEditingUser(null)}>
+                                        Cancel
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                    )}
+                </>
+            );
+        }
+
+
+        ReactDOM.render(<App />, document.getElementById('root'));
+    </script>
+</body>
+</html>
